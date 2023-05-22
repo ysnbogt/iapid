@@ -1,6 +1,8 @@
-import { glob } from 'glob';
-import type { Project } from '../types';
 import os from 'os';
+
+import { glob } from 'glob';
+
+import type { Project } from '../types';
 
 const options = {
   nodir: true,

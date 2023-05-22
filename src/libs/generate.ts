@@ -1,10 +1,15 @@
-import { prompt } from 'enquirer';
+import { readFileSync, writeFileSync } from 'fs';
 import os from 'os';
 import { join } from 'path';
-import { readFileSync, writeFileSync } from 'fs';
-import { getEndpoint } from '../utils/getEndpoints';
+
+import chalk from 'chalk';
+import highlight from 'cli-highlight';
+import { prompt } from 'enquirer';
 import { Argv } from 'yargs';
+
+import { checkPortOpen } from '../utils/checkPortOpen';
 import { fetcher } from '../utils/fetcher';
+import { getEndpoint } from '../utils/getEndpoints';
 import { getTemplate } from '../utils/getTemplate';
 
 const apiDir = join(os.homedir(), '.api');
@@ -27,25 +32,25 @@ export async function generateSubCommand(yargs: Argv) {
     .options('select', {
       alias: 's',
       type: 'boolean',
-      description: '...', // TODO
+      description: 'Select endpoints to generate markdowns.',
       default: defaultSelect,
     })
     .options('display', {
       alias: 'd',
       type: 'boolean',
-      description: '...', // TODO
+      description: 'Display markdowns instead of writing to file.',
       default: defaultDisplay,
     })
     .options('max', {
       alias: 'm',
       type: 'number',
-      description: '...', // TODO
+      description: 'Maximum number of items to display.',
       default: numberOfItems,
     })
     .options('call', {
       alias: 'c',
       type: 'boolean',
-      description: '...', // TODO
+      description: 'Call the endpoint to get the response.',
       default: defaultCall,
     });
 
@@ -66,7 +71,8 @@ export async function generateSubCommand(yargs: Argv) {
 
   const project = projects[projectName.projectName];
   const endpoints = getEndpoint(project);
-  const { markdownType, commandType, outputFilePath } = project;
+  const { origin, markdownType, commandType, outputFilePath } = project;
+  const port = Number(origin.split(':')[2].split('/')[0]);
 
   const template = getTemplate(markdownType);
   const header = getTemplate('header');
@@ -85,6 +91,15 @@ export async function generateSubCommand(yargs: Argv) {
       let json = '';
 
       if (markdownType === 'code_with_result' || call) {
+        if (await checkPortOpen(port)) {
+          console.log(
+            `${chalk.red(
+              'ERROR'
+            )}: Port ${port} is not open. Please run the server first.`
+          );
+          process.exit(1);
+        }
+
         const response = await fetcher(endpoint);
         if (Array.isArray(response) && response.length > max) {
           json = JSON.stringify(response.slice(0, max), null, Number(indent));
@@ -112,13 +127,13 @@ export async function generateSubCommand(yargs: Argv) {
     });
 
     const content = await Promise.all(markdowns).then(markdowns => {
-      return [header, ...markdowns, footer].join('\n');
+      return [header, ...markdowns, footer].join('');
     });
 
     if (!display) {
-      writeFileSync(project.outputFilePath, content);
+      writeFileSync(outputFilePath, content);
     } else {
-      console.log(content);
+      console.log(highlight(content, { language: 'markdown' }));
     }
   }
 }

@@ -1,7 +1,9 @@
-import { prompt } from 'enquirer';
+import { readFileSync, writeFileSync } from 'fs';
 import os from 'os';
 import { join } from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+
+import { prompt } from 'enquirer';
+
 import { getEndpoint } from '../utils/getEndpoints';
 
 const apiDir = join(os.homedir(), '.api');

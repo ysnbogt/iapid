@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import os from 'os';
 import { join } from 'path';
+
 import { MarkdownType } from '../types';
 
 const apiDir = join(os.homedir(), '.api');

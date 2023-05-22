@@ -1,11 +1,14 @@
-import { prompt } from 'enquirer';
-import type { Argv } from 'yargs';
+import { existsSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync } from 'fs';
 import os from 'os';
 import { join, resolve, basename } from 'path';
-import { existsSync } from 'fs';
+
 import chalk from 'chalk';
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import highlight from 'cli-highlight';
+import { prompt } from 'enquirer';
+
 import type { FormInput } from '../types';
+import type { Argv } from 'yargs';
 
 const apiDir = join(os.homedir(), '.api');
 const templatesDir = join(apiDir, 'templates');
@@ -28,15 +31,21 @@ async function getUserInput() {
       name: 'formInput',
       message: 'Please enter information about your API project.',
       required: true,
-      template: `
+      template: highlight(
+        `
         {
             "username": "${username}",
             "path": "/Users/${username}/\${path}",
             "apiTarget": "/Users/${username}/\${path}/\${apiTarget:src/pages/api}/**/*.ts",
-            "origin: "\${origin}",
+            "origin": "\${origin}",
             "outputFileName": "\${outputFileName:endpoints.md}"
         }
         `,
+        {
+          language: 'json',
+          ignoreIllegals: true,
+        }
+      ),
     },
   ]);
 

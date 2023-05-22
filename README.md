@@ -5,11 +5,6 @@
 - [ ] update subcommand
 - [ ] diff subcommand
 - [ ] branch option
-- [ ] color option
-- [ ] help message
-- [ ] display of warning messages based on port status
-- [ ] highlight code
-- [ ] badge?
 
 ## Installation
 

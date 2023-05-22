@@ -1,10 +1,13 @@
-import { prompt } from 'enquirer';
-import type { Argv } from 'yargs';
+import { readFileSync, readdirSync } from 'fs';
 import os from 'os';
 import { join, basename } from 'path';
-import { readFileSync, readdirSync } from 'fs';
-import { getEndpoint } from '../utils/getEndpoints';
+
 import chalk from 'chalk';
+import { prompt } from 'enquirer';
+
+import { getEndpoint } from '../utils/getEndpoints';
+
+import type { Argv } from 'yargs';
 
 const apiDir = join(os.homedir(), '.api');
 const templatesDir = join(apiDir, 'templates');

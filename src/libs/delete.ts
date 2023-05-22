@@ -1,8 +1,10 @@
-import { prompt } from 'enquirer';
-import type { Argv } from 'yargs';
+import { readFileSync, readdirSync, unlink, writeFileSync } from 'fs';
 import os from 'os';
 import { join, basename } from 'path';
-import { readFileSync, readdirSync, unlink, writeFileSync } from 'fs';
+
+import { prompt } from 'enquirer';
+
+import type { Argv } from 'yargs';
 
 const apiDir = join(os.homedir(), '.api');
 const templatesDir = join(apiDir, 'templates');

@@ -1,8 +1,11 @@
-import { prompt } from 'enquirer';
-import type { Argv } from 'yargs';
+import { readFileSync, readdirSync } from 'fs';
 import os from 'os';
 import { join, basename } from 'path';
-import { readFileSync, readdirSync } from 'fs';
+
+import highlight from 'cli-highlight';
+import { prompt } from 'enquirer';
+
+import type { Argv } from 'yargs';
 
 const apiDir = join(os.homedir(), '.api');
 const templatesDir = join(apiDir, 'templates');
@@ -25,8 +28,7 @@ async function templateProcess() {
     'utf8'
   );
 
-  // TODO: Markdown highlight
-  console.log(template);
+  console.log(highlight(template, { language: 'markdown' }));
 }
 
 async function projectProcess() {
@@ -43,8 +45,11 @@ async function projectProcess() {
     choices: Object.keys(projects),
   });
 
-  // TODO: JSON highlight
-  console.log(projects[projectName.projectName]);
+  console.log(
+    highlight(JSON.stringify(projects[projectName.projectName], null, 2), {
+      language: 'json',
+    })
+  );
 }
 
 export function showSubCommand(yargs: Argv) {
