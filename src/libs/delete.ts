@@ -1,58 +1,56 @@
-import { readFileSync, readdirSync, unlink, writeFileSync } from 'fs';
-import os from 'os';
+import { unlink, writeFileSync } from 'fs';
 import { join, basename } from 'path';
 
 import { prompt } from 'enquirer';
 
+import { Command } from './command';
+
 import type { Argv } from 'yargs';
 
-const apiDir = join(os.homedir(), '.api');
-const templatesDir = join(apiDir, 'templates');
-const projectsFilePath = join(apiDir, 'projects.json');
+export class DeleteCommand extends Command {
+  constructor() {
+    super();
 
-async function templateProcess() {
-  const templateFiles = readdirSync(templatesDir).filter(file =>
-    file.endsWith('.tpl')
-  );
-  const templates = templateFiles.map(file => basename(file, '.tpl'));
-
-  const templateName: { templateName: string } = await prompt({
-    type: 'select',
-    name: 'templateName',
-    message: 'Choose template:',
-    choices: templates,
-  });
-
-  unlink(join(templatesDir, `${templateName.templateName}.tpl`), err => {
-    if (err) throw err;
-    console.log('successfully deleted');
-  });
-}
-
-async function projectProcess() {
-  const projects = JSON.parse(readFileSync(projectsFilePath, 'utf8'));
-  if (Object.keys(projects).length === 0) {
-    console.log('No projects');
-    return;
+    this.templateProcess = this.templateProcess.bind(this);
+    this.projectProcess = this.projectProcess.bind(this);
+    this.run = this.run.bind(this);
   }
 
-  const projectName: { projectName: string } = await prompt({
-    type: 'select',
-    name: 'projectName',
-    message: 'Choose project:',
-    choices: Object.keys(projects),
-  });
+  async templateProcess() {
+    const templateFiles = this.getTemplates();
+    const templates = templateFiles.map(file => basename(file, '.tpl'));
+    const templateName: { templateName: string } = await prompt({
+      type: 'select',
+      name: 'templateName',
+      message: 'Choose template:',
+      choices: templates,
+    });
 
-  delete projects[projectName.projectName];
+    unlink(join(this.templatesDir, `${templateName.templateName}.tpl`), err => {
+      if (err) throw err;
+      this.displaySuccess(`Template ${templateName.templateName} deleted`);
+    });
+  }
 
-  writeFileSync(projectsFilePath, JSON.stringify(projects, null, 2));
-  console.log(`Project ${projectName.projectName} deleted`);
-}
+  async projectProcess() {
+    const projects = this.getProjects();
+    const projectName: { projectName: string } = await prompt({
+      type: 'select',
+      name: 'projectName',
+      message: 'Choose project:',
+      choices: Object.keys(projects),
+    });
 
-export function deleteSubCommand(yargs: Argv) {
-  return yargs
-    .command('template', 'Create a new template', templateProcess)
-    .command('project', 'Create a new project', projectProcess)
-    .command('*', '', projectProcess)
-    .demandCommand(1);
+    delete projects[projectName.projectName];
+
+    writeFileSync(this.projectsFilePath, JSON.stringify(projects, null, 2));
+    this.displaySuccess(`Project ${projectName.projectName} deleted`);
+  }
+  run(yargs: Argv) {
+    return yargs
+      .command('template', 'Create a new template', this.templateProcess)
+      .command('project', 'Create a new project', this.projectProcess)
+      .command('*', '', this.projectProcess)
+      .demandCommand(1);
+  }
 }

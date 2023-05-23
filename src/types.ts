@@ -23,16 +23,18 @@ export type Project = {
 
 export type Projects = Record<string, Project>;
 
+export type ResponseMessage = {
+  _default: string;
+  exceeded: string;
+};
+
 export type Config = {
   select: boolean;
   display: boolean;
   call: boolean;
   indent: number;
   numberOfItems: number;
-  responseMessage: {
-    default: string;
-    exceeded: string;
-  };
+  responseMessage: ResponseMessage;
 };
 
 export type FormInput = {

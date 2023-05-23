@@ -1,11 +1,5 @@
 <h1 align="center">iapid</h1>
 
-## TODO
-
-- [ ] update subcommand
-- [ ] diff subcommand
-- [ ] branch option
-
 ## Installation
 
 ```zsh
