@@ -11,9 +11,6 @@ import {
 } from './libs/commands';
 
 process.on('unhandledRejection', () => {
-  console.log(
-    'The process ended unexpectedly. Please check your inputs and try again.'
-  );
   process.exit(1);
 });
 

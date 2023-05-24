@@ -114,7 +114,7 @@ export class NewCommand extends Command {
     // Check if file already exists in destination
     if (existsSync(destPath)) {
       this.displayError('File already exists in templates directory');
-      process.exit(1);
+      return;
     }
 
     // Read file from source path

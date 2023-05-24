@@ -3,7 +3,7 @@ import net from 'net';
 import os from 'os';
 import { join } from 'path';
 
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import chalk from 'chalk';
 import { glob } from 'glob';
 
@@ -27,7 +27,7 @@ export class Command {
 
     if (!this.checkApiDirExists()) {
       console.log(chalk.red('Error'), ': No .api directory');
-      process.exit(1);
+      return;
     }
   }
 
@@ -63,7 +63,7 @@ export class Command {
     const projects = JSON.parse(readFileSync(this.projectsFilePath, 'utf8'));
     if (Object.keys(projects).length === 0) {
       this.displayError('No projects');
-      process.exit(1);
+      return {};
     }
 
     return projects;
@@ -95,16 +95,21 @@ export class Command {
     return endpoints;
   }
 
-  async apiFetch(url: string): Promise<any> {
-    const { data } = await axios.get(url);
-    return data;
+  async apiFetch(url: string): Promise<AxiosResponse> {
+    try {
+      const { data } = await axios.get(url);
+      return data;
+    } catch (error: any) {
+      this.displayError(`Failed to fetch data from ${url}: ${error.message}`);
+      throw error;
+    }
   }
 
   checkPortOpen(port: number): Promise<boolean> {
     return new Promise(resolve => {
       const server = net.createServer();
 
-      server.once('error', (err: any) => {
+      server.once('error', (err: NodeJS.ErrnoException) => {
         if (err.code === 'EADDRINUSE') {
           resolve(false);
         }

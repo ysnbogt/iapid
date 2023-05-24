@@ -91,7 +91,7 @@ export class GenerateCommand extends Command {
               this.displayError(
                 `Port ${port} is not open. Please run the server first.`
               );
-              process.exit(1);
+              throw new Error();
             }
 
             const response = await this.apiFetch(endpoint);
