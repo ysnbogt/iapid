@@ -11,9 +11,9 @@ import {
   UpdateCommand,
 } from './libs/commands';
 
-// process.on('unhandledRejection', () => {
-//   process.exit(1);
-// });
+process.on('unhandledRejection', () => {
+  process.exit(1);
+});
 
 yargs(hideBin(process.argv))
   .command('new', 'Create new resources', new NewCommand().run)
