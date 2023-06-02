@@ -1,5 +1,4 @@
-import { existsSync } from 'fs';
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, resolve, basename } from 'path';
 
 import highlight from 'cli-highlight';
@@ -40,7 +39,6 @@ export class NewCommand extends Command {
             "username": "${this.username}",
             "path": "/Users/${this.username}/\${path}",
             "apiTarget": "/Users/${this.username}/\${path}/\${apiTarget:src/pages/api}/**/*.ts",
-            "origin": "\${origin}",
             "outputFileName": "\${outputFileName:endpoints.md}"
         }
         `,
@@ -51,6 +49,14 @@ export class NewCommand extends Command {
         ),
       },
     ]);
+
+    // --- Origin ---
+    const origin = await prompt({
+      type: 'input',
+      name: 'origin',
+      message: 'Please enter the origin of the API',
+      initial: 'http://localhost:3000/api',
+    });
 
     // --- Output File Path ---
     const { path, outputFileName } = formInput.formInput.values;
@@ -75,7 +81,9 @@ export class NewCommand extends Command {
       type: 'select',
       name: 'markdownType',
       message: 'Choose markdown type:',
-      choices: templateFiles.map(file => basename(file, '.tpl')),
+      choices: templateFiles
+        .map(file => basename(file, '.tpl'))
+        .filter(name => name !== 'header' && name !== 'footer'),
     });
 
     // Combine all answers
@@ -85,6 +93,7 @@ export class NewCommand extends Command {
       ...outputFilePath,
       ...commandType,
       ...markdownType,
+      ...origin,
     };
 
     const projectData = {

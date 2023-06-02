@@ -4,6 +4,7 @@ import { ListCommand } from './list';
 import { NewCommand } from './new';
 import { SetCommand } from './set';
 import { ShowCommand } from './show';
+import { UpdateCommand } from './update';
 
 export {
   DeleteCommand,
@@ -12,4 +13,5 @@ export {
   NewCommand,
   SetCommand,
   ShowCommand,
+  UpdateCommand,
 };

@@ -66,7 +66,7 @@ export class GenerateCommand extends Command {
 
     const project = projects[projectName.projectName];
     const endpoints = this.getEndpoint(project);
-    const { origin, markdownType, commandType, outputPath } = project;
+    const { origin, markdownType, commandType, outputFilePath } = project;
     const port = Number(origin.split(':')[2].split('/')[0]);
 
     const template = this.getTemplate(markdownType);
@@ -129,7 +129,7 @@ export class GenerateCommand extends Command {
       });
 
       if (!display) {
-        writeFileSync(outputPath, content);
+        writeFileSync(outputFilePath, content);
       } else {
         console.log(highlight(content, { language: 'markdown' }));
       }

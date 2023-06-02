@@ -16,7 +16,7 @@ export type Project = {
   origin: string;
   commandType: CommandType;
   markdownType: MarkdownType;
-  outputPath: string;
+  outputFilePath: string;
   outputFileName: string;
   pathParameters: Record<string, string>;
 };

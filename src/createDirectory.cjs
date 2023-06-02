@@ -26,26 +26,28 @@ const configData = {
 // Make sure the .api directory exists
 if (!fs.existsSync(apiDir)) {
   fs.mkdirSync(apiDir);
+
+  // Make sure the .api/templates directory exists
+  if (!fs.existsSync(templatesDir)) {
+    fs.mkdirSync(templatesDir);
+  }
+
+  // Copy files from src/templates to .api/templates
+  fs.readdirSync(srcTemplatesDir).forEach(file => {
+    const srcFile = path.join(srcTemplatesDir, file);
+    const destFile = path.join(templatesDir, file);
+
+    fs.copyFileSync(srcFile, destFile);
+    console.log(`Copied ${file} to ${templatesDir}.`);
+  });
+
+  // Create .api/config.json
+  fs.writeFileSync(configFilePath, JSON.stringify(configData, null, 2));
+  console.log(`Created ${configFilePath}`);
+
+  // Create .api/projects.json with an empty object
+  fs.writeFileSync(projectsFilePath, JSON.stringify({}, null, 2));
+  console.log(`Created ${projectsFilePath}`);
+} else {
+  console.log(".api directory already exists. Skipping creation of directory and files.");
 }
-
-// Make sure the .api/templates directory exists
-if (!fs.existsSync(templatesDir)) {
-  fs.mkdirSync(templatesDir);
-}
-
-// Copy files from src/templates to .api/templates
-fs.readdirSync(srcTemplatesDir).forEach(file => {
-  const srcFile = path.join(srcTemplatesDir, file);
-  const destFile = path.join(templatesDir, file);
-
-  fs.copyFileSync(srcFile, destFile);
-  console.log(`Copied ${file} to ${templatesDir}.`);
-});
-
-// Create .api/config.json
-fs.writeFileSync(configFilePath, JSON.stringify(configData, null, 2));
-console.log(`Created ${configFilePath}`);
-
-// Create .api/projects.json with an empty object
-fs.writeFileSync(projectsFilePath, JSON.stringify({}, null, 2));
-console.log(`Created ${projectsFilePath}`);
